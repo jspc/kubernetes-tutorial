@@ -1,5 +1,4 @@
-#this file is to create deployment and 
-#deployment
+#this file is to create deployment 
 apiVersion: apps/v1
 kind: Deployment #blueprint for pods
 metadata:
@@ -33,7 +32,7 @@ spec:
               name: mongo-secret
               key: mongo-password
 #service
-#service
+
 --- 
 apiVersion: v1
 kind: Service
