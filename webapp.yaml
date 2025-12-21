@@ -1,0 +1,53 @@
+#this file is to create deployment and 
+#deployment
+apiVersion: apps/v1
+kind: Deployment #blueprint for pods
+metadata:
+  name: webapp-deployment
+  labels:
+    app: webapp
+spec:
+  replicas: 1 #how many pods you want to create
+  selector: #help to identify which pods are in which deployment
+    matchLabels:
+      app: webapp
+  template: #configuration for pod
+    metadata:
+      labels: #key-value pair for pod- should be meaningful and relevant to users
+        app: webapp
+    spec:
+      containers:
+      - name: webapp
+        image: nanajanashia/k8s-demo-app:v1.0
+        ports:
+        - containerPort: 3000
+        env:
+        - name: USER_NAME
+          valueFrom:
+            secretKeyRef:
+              name: mongo-secret
+              key: mongo-user
+        - name: USER_PWD
+          valueFrom:
+            secretKeyRef:
+              name: mongo-secret
+              key: mongo-password
+        - name: DB_URL
+          valueFrom:  
+            configMapKeyRef:
+              name: mongo-config
+              key: mongo-url
+--- 
+apiVersion: v1
+kind: Service
+metadata:
+  name: webapp-service
+spec:
+  type: NodePort # configure as external service
+  selector:
+    app: webapp # should match the labels of the deployment
+  ports:
+    - protocol: TCP
+      port: 3000 #service port
+      targetPort: 3000 # port of the container of deployment
+      nodePort: 30100

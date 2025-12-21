@@ -1,0 +1,48 @@
+#this file is to create deployment and 
+#deployment
+apiVersion: apps/v1
+kind: Deployment #blueprint for pods
+metadata:
+  name: mongo-deployment
+  labels:
+    app: mongo
+spec:
+  replicas: 1 #how many pods you want to create
+  selector: #help to identify which pods are in which deployment
+    matchLabels:
+      app: mongo
+  template: #configuration for pod
+    metadata:
+      labels: #key-value pair for pod- should be meaningful and relevant to users
+        app: mongo
+    spec:
+      containers:
+      - name: mongodb
+        image: mongo:8.2.3
+        ports:
+        - containerPort: 27017
+        env:
+        - name: MONGO_INITDB_ROOT_USERNAME
+          valueFrom:
+            secretKeyRef:
+              name: mongo-secret
+              key: mongo-user
+        - name: MONGO_INITDB_ROOT_PASSWORD
+          valueFrom:
+            secretKeyRef:
+              name: mongo-secret
+              key: mongo-password
+#service
+#service
+--- 
+apiVersion: v1
+kind: Service
+metadata:
+  name: mongo-service
+spec:
+  selector:
+    app: mongo # should match the labels of the deployment
+  ports:
+    - protocol: TCP
+      port: 27017 #service port
+      targetPort: 27017 # port of the container of deployment
