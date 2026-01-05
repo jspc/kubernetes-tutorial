@@ -51,7 +51,12 @@ kubectl get nodes
    cd kubernetes-tutorial
    ```
 
-2. Apply the Kubernetes manifests:
+2. Start the minikube cluster using
+   ```bash
+   minikube start
+   ```
+   
+3. Apply the Kubernetes manifests:
    ```bash
    kubectl apply -f mongo-secret.yaml
    kubectl apply -f mongo-config.yaml
@@ -77,6 +82,11 @@ kubectl get nodes
 ---
 
 ## 🔍 Useful Commands
+
+### Get all Pods info
+```bash
+kubectl get pods -A
+```
 
 ### Get Full Pod Description
 ```bash
