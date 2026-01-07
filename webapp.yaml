@@ -43,10 +43,12 @@ kind: Service
 metadata:
   name: webapp-service
   annotations:
-    tailscale.com/expose: "true"
-    tailscale.com/hostname: "webapp"
+    #tailscale.com/expose: "true"
+    tailscale.com/hostname: "sheshta-webapp"
 spec:
   #type: NodePort # configure as external service
+  type: LoadBalancer
+  loadBalancerClass: tailscale
   selector:
     app: webapp # should match the labels of the deployment
   ports:
