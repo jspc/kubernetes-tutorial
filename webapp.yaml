@@ -1,5 +1,23 @@
-#this file is to create deployment and 
-#deployment
+apiVersion: v1
+kind: ServiceAccount
+metadata:
+  name: webapp-sa
+---
+
+apiVersion: rbac.authorization.k8s.io/v1
+kind: RoleBinding
+metadata:
+  name: secret-all
+  namespace: default
+subjects:
+- kind: ServiceAccount
+  name: webapp-sa
+roleRef:
+  kind: Role
+  name: secret-all
+  
+---
+#this file is to create deployment 
 apiVersion: apps/v1
 kind: Deployment #blueprint for pods
 metadata:
@@ -7,7 +25,7 @@ metadata:
   labels:
     app: webapp
 spec:
-  replicas: 1 #how many pods you want to create
+  replicas: 3 #how many pods you want to create
   selector: #help to identify which pods are in which deployment
     matchLabels:
       app: webapp
@@ -16,6 +34,7 @@ spec:
       labels: #key-value pair for pod- should be meaningful and relevant to users
         app: webapp
     spec:
+      serviceAccountName: webapp-sa
       containers:
       - name: webapp
         image: nanajanashia/k8s-demo-app:v1.0
@@ -37,22 +56,55 @@ spec:
             configMapKeyRef:
               name: mongo-config
               key: mongo-url
+
+      - name: tailscale
+        image: tailscale/tailscale
+        securityContext:
+          capabilities:
+            add: ["NET_ADMIN", "NET_RAW"]
+        env:
+        - name: TS_AUTHKEY
+          valueFrom:
+            secretKeyRef:
+              name: ts-auth
+              key: authkey
+        - name: POD_NAME
+          valueFrom:
+            fieldRef:
+              apiVersion: v1
+              fieldPath: metadata.name
+        - name: TS_KUBE_SECRET
+          value: $(POD_NAME)
 --- 
 apiVersion: v1
 kind: Service
 metadata:
   name: webapp-service
-  annotations:
-    #tailscale.com/expose: "true"
-    tailscale.com/hostname: "sheshta-webapp"
+
 spec:
   #type: NodePort # configure as external service
-  type: LoadBalancer
-  loadBalancerClass: tailscale
+  type: ClusterIP
+  
   selector:
     app: webapp # should match the labels of the deployment
   ports:
     - protocol: TCP
-      port: 3000 #service port
+      port: 80 #service port
       targetPort: 3000 # port of the container of deployment
-      nodePort: 30100
+
+---
+apiVersion: networking.k8s.io/v1
+kind: Ingress
+metadata:
+  name: sheshta-app
+spec:
+  defaultBackend:
+    service:
+      name: webapp-service
+      port:
+        number: 80
+  ingressClassName: tailscale
+  tls:
+    - hosts:
+        - sheshta-app
+      
