@@ -1,8 +1,8 @@
-# 🧠 Kubernetes Tutorial — MongoDB + Web App
+#  Kubernetes Tutorial — MongoDB + Web App
 
 This repository demonstrates a **beginner-friendly Kubernetes project** where you deploy a **MongoDB database** and a **Node.js/Express-based web application** that connects to it.
 
-## 🌟 What You'll Learn
+## What You'll Learn
 
 - Deployments
 - Services
@@ -43,7 +43,7 @@ kubectl get nodes
 
 ---
 
-## 🚀 Getting Started
+## Getting Started
 
 1. Clone the repository:
    ```bash
