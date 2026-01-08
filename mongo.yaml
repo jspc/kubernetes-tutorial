@@ -1,8 +1,9 @@
-#this file is to create deployment 
+#this file is to create deployment
 apiVersion: apps/v1
 kind: Deployment #blueprint for pods
 metadata:
   name: mongo-deployment
+  namespace: sheshta-app
   labels:
     app: mongo
 spec:
@@ -33,11 +34,12 @@ spec:
               key: mongo-password
 #service
 
---- 
+---
 apiVersion: v1
 kind: Service
 metadata:
   name: mongo-service
+  namespace: sheshta-app
 spec:
   selector:
     app: mongo # should match the labels of the deployment
